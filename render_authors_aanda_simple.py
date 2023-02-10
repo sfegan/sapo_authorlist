@@ -20,8 +20,8 @@ with open('authors_aanda.tex','w') as fp:
     for ia,affil in enumerate(affiliations):
         startwith= '\\institute{' if ia==0 else '  \\and '
         print(startwith+affil['address_latex'],file=fp)
-
     print('}',file=fp)
+
     print('\\maketitle',file=fp)
     print('\\begin{thebibliography}{HELLO}',file=fp)
     print('\\bibitem[1]{Fake reference to prompt A&A macro to emit instiutions}',file=fp)

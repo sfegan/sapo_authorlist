@@ -186,6 +186,7 @@ for author_id in sorted(authors, key=lambda x: asciify(people[x][7]).lower()):
             if(place_id not in author_affiliation_key):
                 author_affiliation_key[place_id] = len(affiliations_list)
                 affiliations_list.append(dict(
+                    affil_id          = len(affiliations_list),
                     place_id          = place_id,
                     place_key         = places[place_id][0],
                     country           = places[place_id][2],
