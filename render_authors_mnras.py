@@ -8,6 +8,7 @@ affiliations = author_affiliation_list['affiliations']
 
 with open('authors_mnras.tex','w') as fp:
     print('\\documentclass{mnras}',file=fp)
+    print('\\usepackage{enumitem}',file=fp)
     print('\\usepackage[T1]{fontenc}',file=fp)
     print('\\title{Draft LMC paper author list}',file=fp)
 
@@ -24,9 +25,9 @@ with open('authors_mnras.tex','w') as fp:
     print('\nNumber of affiliations:',len(affiliations),file=fp)
 
     print('\n\\section*{Affiliations}',file=fp)
-    print('\\noindent{\\it',file=fp)
+    print('\\begin{description}[leftmargin=1.5em,labelsep=0.25em,labelwidth=1.25em]',file=fp)
     for ia,affil in enumerate(affiliations):
-        print('$^{'+str(affil['affil_id']+1)+'}$'+affil['address_latex']+'\\\\',file=fp)
-    print('}',file=fp)
+        print('\\item[\\hspace{\\fill}$^{'+str(affil['affil_id']+1)+'}$] '+affil['address_latex'],file=fp)
+    print('\\end{description}',file=fp)
 
     print('\\end{document}',file=fp)
