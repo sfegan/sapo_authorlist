@@ -14,26 +14,25 @@ with open('authors_mnras.tex','w') as fp:
 
     print('\\author['+author_list[0]['author_latex']+' et al]{\parbox{\\textwidth}{\\raggedright\\normalsize%',file=fp)
     for ia,author in enumerate(author_list):
-        inst = '$^{' + ','.join(['\\ref{AFFIL::'+x+'}' for x in author['affil_keys']]) + '}$'
+        inst = '$^{' + ','.join(['\\ref{AFFIL::'+x+'}' for x in author['affil_place_keys']]) + '}$'
         print('  '+author['author_latex']+inst,file=fp)
-    print('\\newline\\newline\n\\emph{\\normalsize Affiliations are listed at the end of the paper}}}',file=fp)
+    print('\\newline\\newline\n\\emph{Affiliations can be found at the end of the article}}}',file=fp)
             
-
     print('\\begin{document}',file=fp)
     print('\\maketitle',file=fp)
-
 
     print('\n\\section*{Author breakdown}',file=fp)
     print('\nNumber of authors:',len(author_list),'\\\\',file=fp)
     print('Number of affiliations:',len(affiliations),file=fp)
     country_count = dict()
     for author in author_list:
-        for country in [affiliations[id]['country'] for id in author['affil_ids']]:
-            country_count[country] = country_count.get(country, 0) + 1/len(author['affil_ids'])
-    print('\n\\begin{description}',file=fp)
+        for country in [affiliations[id]['country'] for id in author['affil_nums']]:
+            country_count[country] = country_count.get(country, 0) + 1/len(author['affil_nums'])
+    print('\n\\begin{tabbing}',file=fp)
+    print('\\textbf{United Kingdom UK} \\= 8888.8 \\= \\kill',file=fp)
     for k in sorted(country_count,key=lambda x:country_count[x],reverse=True):
-        print('\\item[%s:] %g'%(k,int(country_count[k]*10)/10),file=fp)
-    print('\\end{description}',file=fp)
+        print('\\textbf{%s} \\> %g \\> %.1f\\%%\\\\'%(k,int(country_count[k]*10)/10, country_count[k]/len(author_list)*100),file=fp)
+    print('\\end{tabbing}',file=fp)
 
     print('\n\\section*{Affiliations}',file=fp)
     print('\\begin{enumerate}[label=$^{\\arabic*}$,ref=\\arabic*,leftmargin=1.5em,labelsep=0.25em,labelwidth=1.25em]',file=fp)
@@ -42,5 +41,3 @@ with open('authors_mnras.tex','w') as fp:
     print('\\end{enumerate}',file=fp)
 
     print('\\end{document}',file=fp)
-
-#\\hspace{\\fill}$^{'+str(affil['affil_id']+1)+'}$

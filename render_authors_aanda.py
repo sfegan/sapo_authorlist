@@ -12,7 +12,7 @@ with open('authors_aanda.tex','w') as fp:
     print('\\title{Draft LMC paper author list}',file=fp)
 
     for ia,author in enumerate(author_list):
-        inst = '\\inst{' + ','.join(['\\ref{'+x+'}' for x in author['affil_keys']]) + '}'
+        inst = '\\inst{' + ','.join(['\\ref{'+x+'}' for x in author['affil_place_keys']]) + '}'
         startswith = '\\author{' if ia==0 else '  \\and '        
         print(startswith+author['author_latex']+inst,file=fp)
     print('}',file=fp)

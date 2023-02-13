@@ -14,7 +14,7 @@ with open('authors_mnras.tex','w') as fp:
 
     print('\\author['+author_list[0]['author_latex']+' et al]{\parbox{\\textwidth}{\\raggedright\\normalsize%',file=fp)
     for ia,author in enumerate(author_list):
-        inst = '$^{' + ','.join([str(x+1) for x in author['affil_ids']]) + '}$'
+        inst = '$^{' + ','.join(author['affil_num_strs']) + '}$'
         print('  '+author['author_latex']+inst,file=fp)
     print('\\newline\\newline\n\\emph{\\normalsize Affiliations are listed at the end of the paper}}}',file=fp)
             
@@ -27,7 +27,7 @@ with open('authors_mnras.tex','w') as fp:
     print('\n\\section*{Affiliations}',file=fp)
     print('\\begin{description}[leftmargin=1.5em,labelsep=0.25em,labelwidth=1.25em]',file=fp)
     for ia,affil in enumerate(affiliations):
-        print('\\item[\\hspace{\\fill}$^{'+str(affil['affil_id']+1)+'}$] '+affil['address_latex'],file=fp)
+        print('\\item[\\hspace{\\fill}$^{'+str(affil['affil_num']+1)+'}$] '+affil['address_latex'],file=fp)
     print('\\end{description}',file=fp)
 
     print('\\end{document}',file=fp)
