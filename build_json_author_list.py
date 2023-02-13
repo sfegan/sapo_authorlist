@@ -179,14 +179,16 @@ author_affiliation_key = dict()
 for author_id in sorted(authors, key=lambda x: asciify(people[x][7]).lower()):
     ai = asciify(people[author_id][7]).lower()
     place_ids = []
-    affil_ids = []
-    affil_keys = []
+    place_keys = []
+    affil_nums = []
+    affil_num_strs = []
     for place_id in people[author_id][8:11]:
         if(place_id):
             if(place_id not in author_affiliation_key):
                 author_affiliation_key[place_id] = len(affiliations_list)
                 affiliations_list.append(dict(
-                    affil_id          = len(affiliations_list),
+                    affil_num         = len(affiliations_list),
+                    affil_num_str     = str(len(affiliations_list)+1),
                     place_id          = place_id,
                     place_key         = places[place_id][0],
                     country           = places[place_id][2],
@@ -196,8 +198,9 @@ for author_id in sorted(authors, key=lambda x: asciify(people[x][7]).lower()):
                     address_latex     = pylatexenc.latexencode.unicode_to_latex(places[place_id][3])
                 ))
             place_ids.append(place_id)
-            affil_ids.append(author_affiliation_key[place_id])
-            affil_keys.append(places[place_id][0])
+            place_keys.append(places[place_id][0])
+            affil_nums.append(author_affiliation_key[place_id])
+            affil_num_strs.append(str(author_affiliation_key[place_id]+1))
             ai += ", %06d"%author_affiliation_key[place_id]
     
     lastname, firstname = people[author_id][7].split(',')
@@ -208,9 +211,10 @@ for author_id in sorted(authors, key=lambda x: asciify(people[x][7]).lower()):
         author_id        = author_id,
         lastname         = people[author_id][0],
         firstname        = people[author_id][1],
-        place_ids        = place_ids,
-        affil_ids        = affil_ids,
-        affil_keys       = affil_keys,
+        affil_place_ids  = place_ids,
+        affil_place_keys = place_keys,
+        affil_nums       = affil_nums,
+        affil_num_strs   = affil_num_strs,
         author_sortorder = asciify(people[author_id][7]).lower(),
         author_asciified = author_asciified(firstname, lastname),
         author_unicode   = author_unicode(firstname, lastname),
@@ -218,8 +222,54 @@ for author_id in sorted(authors, key=lambda x: asciify(people[x][7]).lower()):
         author_latex     = author_latex(firstname, lastname),
     )
 
+comment = \
+    "CTA author list in JSON format. Contains an array of authors in order that\n" \
+    + "they should be included in the author list (element \"authors\"), and an array\n" \
+    + "of places to which the authors are affiliated (element \"affiliations\").\n\n" \
+    + "Array \"authors\" :\n" \
+    + "- author_id         : Unique identifier of author in SAPO database.\n" \
+    + "- lastname          : Last name(s) of author in unicode.\n" \
+    + "- firstname         : First name(s) of author in unicode.\n" \
+    + "- email             : Email addresses for first authors (optional).\n" \
+    + "- author_sortorder  : Sort key used to order authors names (ascii in format\n" \
+    + "                      \"lastname, f. i.\").\n" \
+    + "- author_asciified  : Ascii version of author's name (in format \n"\
+    + "                      \"F. I. Lastname\", with unicode removed).\n" \
+    + "- author_unicode    : Unicode version of author's name in format\n" \
+    + "                      \"F. I. Lastname\".\n" \
+    + "- author_html       : HTML version of author's name in format\n" \
+    + "                      \"F.&nbsp;I.&nbsp;Lastname\".\n" \
+    + "- author_latex      : LaTeX version of author's name in format\n" \
+    + "                      \"F.~I.~Lastname\".\n" \
+    + "- affil_nums        : Array listing positions of authors' affiliations in the\n" \
+    + "                      affiliation array (starting at zero).\n" \
+    + "- affil_num_strs    : Array listing positions of authors' affiliations in the\n" \
+    + "                      affiliation array as string (staring at one).\n" \
+    + "- affil_place_keys  : Array of text keys for authors affiliations. Can be used\n" \
+    + "                      as a unique but readble key for LaTeX \\ref/\\label pairing\n" \
+    + "                      to identify affiliations.\n" \
+    + "- affil_place_ids   : Array of numeric identifiers for authors affiliations\n" \
+    + "                      corresponding to identifier in the SAPO database \n" \
+    + "                      (not recommended for general use).\n\n" \
+    + "Array \"affiliations\" :\n" \
+    + "- affil_num         : Position of affiliation in the affiliation array\n" \
+    + "                      (starting at zero).\n" \
+    + "- affil_num_str     : Position of affiliation in the affiliation array as\n" \
+    + "                      string (staring at one).\n" \
+    + "- place_key         : Text key for affiliation. Can be used as a unique but\n" \
+    + "                      readble key for LaTeX \\ref/\\label pairing to identify\n" \
+    + "                      affiliations.\n" \
+    + "- place_id          : Numeric identifier for affiliation corresponding to \n" \
+    + "                      identifier in the SAPO database (not recommended for\n" \
+    + "                      general use).\n" \
+    + "- country           : Country.\n" \
+    + "- address_asciified : Ascii version of address (with unicode removed).\n" \
+    + "- address_unicode   : Unicode version of address.\n" \
+    + "- address_html      : HTML version of address with unicode escaped.\n" \
+    + "- address_latex     : LaTeX version of address with unicode escaped.\n"
 
 author_affiliation_list = dict(
+    _comment     = comment,
     authors      = [author_list[x] for x in sorted(author_list)],
     affiliations = affiliations_list
 )
