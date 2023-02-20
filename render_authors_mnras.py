@@ -29,6 +29,10 @@ with open('authors_mnras.tex','w') as fp:
     for iemail, email in enumerate(email_list):
         print('\\footnotetext['+str(iemail+1)+']{'+email+'\\label{CONTACTAUTHOR::'+str(iemail+1)+'}}',file=fp)
 
+    print('\\flushleft If your details are incorrect on this author list, please let us know using the',file=fp)
+    print('\\href{https://docs.google.com/forms/d/e/1FAIpQLSc2PVP7k_vS-PI80zm-_naTkkqH5IYhaA7_ZO477Ahgt7o4BA/viewform?usp=sf_link}{SAPO change of name and affiliation form}.',file=fp)
+    print('\\textbf{Note}, you cannot opt-in to the author list using this form.',file=fp)
+
     print('\n\\section*{Affiliations}',file=fp)
     print('\\begin{enumerate}[label=$^{\\arabic*}$,ref=\\arabic*,leftmargin=1.5em,labelsep=0.25em,labelwidth=1.25em]',file=fp)
     for ia,affil in enumerate(affiliations):
