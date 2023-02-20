@@ -112,9 +112,10 @@ def format_author_name(firstname, lastname):
     return name
 
 alt_email = load_alt_email_csv('Copy of CTA_LMC_Optin (Responses) - Alternative email.csv')
-places = load_places_csv('Copy of CTA_LMC_Optin (Responses) - Affiliation addresses.csv')
+places = load_places_csv('Copy of CTA_LMC_Optin (Responses) - Places.csv')
 people = load_people_csv('Copy of CTA_LMC_Optin (Responses) - People.csv')
 signers = load_signers_csv('Copy of CTA_LMC_Optin (Responses) - Form responses 1.csv')
+corresponding = [ '3476', '3136', '1530' ]
 
 main_emails = dict()
 cta_emails = dict()
@@ -187,15 +188,17 @@ for author_id in sorted(authors, key=lambda x: asciify(people[x][7]).lower()):
             if(place_id not in author_affiliation_key):
                 author_affiliation_key[place_id] = len(affiliations_list)
                 affiliations_list.append(dict(
-                    affil_num         = len(affiliations_list),
-                    affil_num_str     = str(len(affiliations_list)+1),
-                    place_id          = place_id,
-                    place_key         = places[place_id][0],
-                    country           = places[place_id][2],
-                    address_asciified = asciify(places[place_id][3]),
-                    address_unicode   = places[place_id][3],
-                    address_html      = htmlify(places[place_id][3]),
-                    address_latex     = pylatexenc.latexencode.unicode_to_latex(places[place_id][3])
+                    affil_num          = len(affiliations_list),
+                    affil_num_str      = str(len(affiliations_list)+1),
+                    place_id           = place_id,
+                    place_key          = places[place_id][0],
+                    short_name_unicode = places[place_id][1],
+                    short_name_latex   = pylatexenc.latexencode.unicode_to_latex(places[place_id][1]),
+                    country            = places[place_id][2],
+                    address_asciified  = asciify(places[place_id][3]),
+                    address_unicode    = places[place_id][3],
+                    address_html       = htmlify(places[place_id][3]),
+                    address_latex      = pylatexenc.latexencode.unicode_to_latex(places[place_id][3])
                 ))
             place_ids.append(place_id)
             place_keys.append(places[place_id][0])
@@ -221,6 +224,10 @@ for author_id in sorted(authors, key=lambda x: asciify(people[x][7]).lower()):
         author_html      = author_html(firstname, lastname),
         author_latex     = author_latex(firstname, lastname),
     )
+    if author_id in corresponding:
+        print("Info : corresponding author", author_unicode(firstname, lastname),
+              "(" + people[author_id][2] +")")
+        author_list[ai]['email'] = people[author_id][2]
 
 comment = \
     "CTA author list in JSON format. Contains an array of authors in order that\n" \
@@ -231,6 +238,7 @@ comment = \
     + "- lastname          : Last name(s) of author in unicode.\n" \
     + "- firstname         : First name(s) of author in unicode.\n" \
     + "- email             : Email addresses for first authors (optional).\n" \
+    + "- orcid             : ORCID identifier if available (optional).\n" \
     + "- author_sortorder  : Sort key used to order authors names (ascii in format\n" \
     + "                      \"lastname, f. i.\").\n" \
     + "- author_asciified  : Ascii version of author's name (in format \n"\
@@ -262,6 +270,8 @@ comment = \
     + "- place_id          : Numeric identifier for affiliation corresponding to \n" \
     + "                      identifier in the SAPO database (not recommended for\n" \
     + "                      general use).\n" \
+    + "- short_name_unicode: Short name of place in unicode.\n" \
+    + "- short_name_latex  : Short name of place in LaTeX format.\n" \
     + "- country           : Country.\n" \
     + "- address_asciified : Ascii version of address (with unicode removed).\n" \
     + "- address_unicode   : Unicode version of address.\n" \
