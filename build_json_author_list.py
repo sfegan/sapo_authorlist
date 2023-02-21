@@ -141,15 +141,15 @@ def load_signers_google(uploader, sheet_id_and_tab_name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--people_sheet', default='People', help='Name of SAPO "People" sheet in Google or as CSV file')
-    parser.add_argument('--places_sheet', default='Places', help='Name of SAPO "Places" sheet in Google or as CSV file')
-    parser.add_argument('--alt_email_sheet', default='Alternative email', help='Name of SAPO "Alternative email" sheet in Google or as CSV file')
-    parser.add_argument('--opt_in_sheet', default='Opt in', help='Name of author opt-in sheet in Google or as CSV file')
-    parser.add_argument('--csv_base', default='SAPO Author List', help='Base name of CSV files')
-    parser.add_argument('--google_base', default=None, help='Base address of SAPO Authorship sheet')
-    parser.add_argument('--google_token', default='token.pickle', help='Google authentication token')
-    parser.add_argument('--email_authors', default=None, help='IDs of people whose email addresses should be added')
-    parser.add_argument('--output', '-o', default='authors.json', help='Output JSON file name')
+    parser.add_argument('--people_sheet', default='People', help='Name of SAPO "People" sheet in Google or as CSV file (default: "%(default)s")')
+    parser.add_argument('--places_sheet', default='Places', help='Name of SAPO "Places" sheet in Google or as CSV file (default: "%(default)s")')
+    parser.add_argument('--alt_email_sheet', default='Alternative email', help='Name of SAPO "Alternative email" sheet in Google or as CSV file (default: "%(default)s")')
+    parser.add_argument('--opt_in_sheet', default='Opt in', help='Name of author opt-in sheet in Google or as CSV file (default: "%(default)s")')
+    parser.add_argument('--csv_base', default='SAPO Author List', help='Base name of CSV files (default: "%(default)s")')
+    parser.add_argument('--google_base', default=None, help='Base address of SAPO Authorship sheet. If not set, then read data from CSV files rather than Google')
+    parser.add_argument('--google_token', default='token.pickle', help='Google authentication token (default: "%(default)s")')
+    parser.add_argument('--email_authors', default=None, help='IDs of people whose email addresses should be added. Should be given as a list of People IDs')
+    parser.add_argument('--output', '-o', default='authors.json', help='Output JSON file name (default: "%(default)s")')
 
     args = parser.parse_args()
 
