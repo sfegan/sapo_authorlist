@@ -1,3 +1,8 @@
+# Simple script to generate author list using A&A macros. Meant as an
+# example to guide collaborators that might wish to generate author 
+# lists in new formats. Internally SAPO uses more sophisticated script
+# render_authors_latex.py (see https://github.com/sfegan/sapo_authorlist)
+
 import json
 import sys
 
