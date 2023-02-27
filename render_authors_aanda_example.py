@@ -16,10 +16,12 @@ with open('authors.tex','w') as fp:
     # Set default stream for print to "fp"
     sys.stdout = fp
 
-    # Note the A&A macros hae a problem generating large author lists. Here
-    # we use "draft" mode to fix it, but this would not be a solution for a
-    # real paper. It's not a problem for the journal as they do the layout
-    # professionally but it is a problem for manuscripts uploaded to astro-ph.
+    # Note the A&A macros hae a problem generating large author lists. It's 
+    # not a problem for the journal version of the paper, as they do the 
+    # layout professionally, but it is a problem for manuscripts generated
+    # using the macros to be uploaded to astro-ph. Here we use "draft" mode 
+    # which seems to fix the layout, but this would not be a solution for the 
+    # full paper. For an better solution see "render_authors_latex.py".
     
     print('\\documentclass[longauth,draft]{aa}')
     print('\\begin{document}')

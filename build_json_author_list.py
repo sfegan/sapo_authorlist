@@ -272,6 +272,9 @@ if __name__ == "__main__":
             author_id        = author_id,
             lastname         = people[author_id][0],
             firstname        = people[author_id][1],
+            email            = people[author_id][2] or '',
+            corresponding    = False,
+            orcid            = people[author_id][11] if len(people[author_id])>=12 else '',
             affil_place_ids  = place_ids,
             affil_place_keys = place_keys,
             affil_nums       = affil_nums,
@@ -285,7 +288,7 @@ if __name__ == "__main__":
         if author_id in corresponding:
             print("Info corresponding author :", author_unicode(firstname, lastname),
                 "(" + people[author_id][2] +")")
-            author_list[ai]['email'] = people[author_id][2]
+            author_list[ai]['corresponding'] = True
 
     comment = \
         "CTA author list in JSON format. Contains an array of authors in order that\n" \
@@ -295,7 +298,8 @@ if __name__ == "__main__":
         + "- author_id         : Unique identifier of author in SAPO database.\n" \
         + "- lastname          : Last name(s) of author in unicode.\n" \
         + "- firstname         : First name(s) of author in unicode.\n" \
-        + "- email             : Email addresses for first authors (optional).\n" \
+        + "- email             : Email addresses for all authors.\n" \
+        + "- corresponding     : Corresponding author.\n" \
         + "- orcid             : ORCID identifier if available (optional).\n" \
         + "- author_sortorder  : Sort key used to order authors names (ascii in format\n" \
         + "                      \"lastname, f. i.\").\n" \

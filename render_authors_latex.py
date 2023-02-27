@@ -57,7 +57,7 @@ class MNRASLatexRenderer(LatexRenderer):
     def author(self, iauthor, author):
         inst = ['\\ref{AFFIL::'+x+'}' for x in author['affil_place_keys']]
         inst = '$^{' + ','.join(inst) + '}$'
-        if 'email' in author:
+        if author['corresponding'] and 'email' in author:
             inst += '\\ref{CONTACTAUTHOR::'+str(len(self.email_list)+1)+'}'
             self.email_list.append('\\url{'+author['email']+'} ('+author['author_latex']+')')
         print('  ',author['author_latex'],inst,sep='')
