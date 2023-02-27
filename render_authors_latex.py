@@ -83,8 +83,9 @@ class MNRASLatexRenderer(LatexRenderer):
         print('\\end{enumerate}')
 
 class AALatexRenderer(LatexRenderer):
-    def __init__(self, astroph=False, document_class="aa", class_options="longauth") -> None:
+    def __init__(self, astroph=False, orcid=False, document_class="aa", class_options="longauth") -> None:
         self.astroph = astroph
+        self.orcid = orcid
         super().__init__(document_class, class_options)
 
     def setup_class(self):
@@ -109,8 +110,10 @@ class AALatexRenderer(LatexRenderer):
             inst = '$^{' + ','.join(inst) + '}$'
         else:
             inst = '\\inst{' + ','.join(inst) + '}'
-        if 'email' in author:
+        if author['corresponding'] and 'email' in author:
             inst += '\\thanks{\\url{'+author['email']+'} ('+author['author_latex']+')}'
+        if self.orcid and 'orcid' in author and author['orcid']:
+            inst += '\\orcid{' + author['orcid'] + '}'
         print(linestart,author['author_latex'],inst,sep='')
 
     def affiliation_in_author_block(self, iaffiliation, affiliation):
@@ -158,6 +161,7 @@ if __name__ == "__main__":
     parser.add_argument('--mnras', action='store_true', help='Generate LaTeX using MNRAS macros')
     parser.add_argument('--title', '-t', default='CTA paper draft author list', help='Title for LaTeX document')
     parser.add_argument('--suppress_summary', action='store_true', help='Suppress SAPO summary information')
+    parser.add_argument('--orcid', action='store_true', help='Output ORCID identities for authors where they are available and supported by the LaTeX style')
     parser.add_argument('--input', '-i', default='authors.json', help='Input JSON file name (default: "%(default)s")')
     parser.add_argument('--output', '-o', default='authors.tex', help='Output LaTeX file name (default: "%(default)s")')
 
@@ -173,9 +177,9 @@ if __name__ == "__main__":
     if(args.render == 'mnras'):
         render = MNRASLatexRenderer()
     elif(args.render == 'aa'):
-        render = AALatexRenderer()
+        render = AALatexRenderer(orcid=args.orcid)
     elif(args.render == 'aa-astroph'):
-        render = AALatexRenderer(astroph=True)
+        render = AALatexRenderer(astroph=True,orcid=args.orcid)
 
     with open(args.output,'w') as fp:
         # Set default stream for print to "fp"
