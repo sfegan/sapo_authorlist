@@ -104,7 +104,13 @@ def load_people_rows(rows):
         if row[0]:
             if row[0] in people:
                 print('WARNING duplicate person id :',row[0])
-            people[row[0]] = [x.strip() for x in row[1:12]]
+            row_data = row[1:12]
+            if len(row)>=16:
+                print(row[15])
+                row_data.extend([row[15]])
+            else:
+                row_data.extend([''])
+            people[row[0]] = [x.strip() for x in row_data]
     print("Info read :",len(people),"people")
     return people
 
