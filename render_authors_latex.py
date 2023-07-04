@@ -15,8 +15,10 @@ class LatexRenderer:
         print('\\usepackage{enumitem}')
         print('\\usepackage[T1]{fontenc}')
 
-    def begin_document(self, title = "CTA paper author list"):
+    def begin_document(self, title = "CTA paper author list", date=""):
         print('\\title{',title,'}',sep='')
+        if(date):
+            print('\\date{',date,'}',sep='')
         print('\n\\begin{document}')
 
     def generate_title_pages(self):
@@ -46,6 +48,82 @@ class LatexRenderer:
     def end_affiliations_section(self):
         pass
 
+class SAPOLatexRenderer(LatexRenderer):
+    def __init__(self, orcid=False, document_class="article", class_options='a4paper,10pt') -> None:
+        self.orcid = orcid
+        self.document_class = document_class
+        self.class_options = class_options
+        self.email_list = []
+        self.author_list = []
+
+    def setup_class(self):
+        if(self.class_options):
+            print('\\documentclass[',self.class_options,']{',self.document_class,'}',sep='')
+        else:
+            print('\\documentclass{',self.document_class,'}',sep='')
+        print('\\usepackage[margin=2cm, top=2cm, bottom=2cm]{geometry}')
+        print('\\usepackage{graphicx}')
+        print('\\usepackage{hyperref}')
+        print('\\usepackage{enumitem}')
+        print('\\usepackage[T1]{fontenc}')
+        if(self.orcid):
+            print('\\newcommand{\\orcid}[1]{\\unskip\\protect\\href{https://orcid.org/#1}{\\protect\\includegraphics[width=8pt,clip]{logo_orcid}}}')
+
+    def begin_document(self, title = "CTA paper author list", date=""):
+        print('\n\\begin{document}')
+        print('\\centering\\LARGE')
+        print(title,'\\\\[0.5cm]',sep='')
+        print('\\normalsize')
+        if(date):
+            print(date,'\\\\[0.5cm]',sep='')
+        print('\\raggedright')
+        for ia,a in enumerate(self.author_list):
+            print('  \\mbox{',a,'}',', ' if ia < len(self.author_list)-1 else '',sep='')
+
+        if(self.email_list):
+            print('\\subsection*{Corresponding authors}')
+            for iemail, email in enumerate(self.email_list):
+                print(email,'\\\\',sep='')
+        print('\\twocolumn')
+
+    def generate_title_pages(self):
+        pass
+
+    def end_document(self):
+        print('\n\\end{document}')
+
+    def start_author_block(self, authors, affiliations):
+        pass
+
+    def author(self, iauthor, author):
+        inst = ['\\ref{AFFIL::'+x+'}' for x in author['affil_place_keys']]
+        inst = '$^{' + ','.join(inst) + '}$'
+        if self.orcid and 'orcid' in author and author['orcid']:
+            inst += '\\orcid{' + author['orcid'].removeprefix('https://orcid.org/') + '}'
+        if author['corresponding'] and 'email' in author:
+            self.email_list.append(author['author_latex'] + ' (\\url{'+author['email']+'})')
+        self.author_list.append(author['author_latex']+inst)
+        pass
+
+    def affiliation_in_author_block(self, iaffiliation, affiliation):
+        pass
+
+    def end_author_block(self):
+        pass
+
+    def start_affiliations_section(self, affiliations):
+        print('% Note : in this "astroph" mode we generate the affiliation list ourselves.')
+        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        print('\\section*{Affiliations}')
+        print('\\begin{enumerate}[label=$^{\\arabic*}$,ref=\\arabic*,leftmargin=1.5em,labelsep=0.25em,labelwidth=1.25em]')
+
+    def affiliation_in_section(self, iaffiliation, affiliation):
+        print('\\item ',affiliation['address_latex'],
+            '\\label{AFFIL::',affiliation['place_key'],'}',sep='')
+
+    def end_affiliations_section(self):
+        print('\\end{enumerate}')
+
 class MNRASLatexRenderer(LatexRenderer):
     def __init__(self, document_class="mnras", class_options=None) -> None:
         super().__init__(document_class)
@@ -57,6 +135,8 @@ class MNRASLatexRenderer(LatexRenderer):
     def author(self, iauthor, author):
         inst = ['\\ref{AFFIL::'+x+'}' for x in author['affil_place_keys']]
         inst = '$^{' + ','.join(inst) + '}$'
+        if self.orcid and 'orcid' in author and author['orcid']:
+            inst += '\\orcid{' + author['orcid'] + '}'
         if author['corresponding'] and 'email' in author:
             inst += '\\ref{CONTACTAUTHOR::'+str(len(self.email_list)+1)+'}'
             self.email_list.append('\\url{'+author['email']+'} ('+author['author_latex']+')')
@@ -155,11 +235,10 @@ class AALatexRenderer(LatexRenderer):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--render', default='mnras',
-                        choices=['mnras', 'aa', 'aa-astroph'],
+    parser.add_argument('--render', default='sapo',
+                        choices=['sapo', 'mnras', 'aa', 'aa-astroph'],
                         help='LaTeX class to use (default: "%(default)s")')
-    parser.add_argument('--mnras', action='store_true', help='Generate LaTeX using MNRAS macros')
-    parser.add_argument('--title', '-t', default='CTA paper draft author list', help='Title for LaTeX document')
+    parser.add_argument('--title', '-t', default='', help='Title for LaTeX document')
     parser.add_argument('--suppress_summary', action='store_true', help='Suppress SAPO summary information')
     parser.add_argument('--orcid', action='store_true', help='Output ORCID identities for authors where they are available and supported by the LaTeX style')
     parser.add_argument('--input', '-i', default='authors.json', help='Input JSON file name (default: "%(default)s")')
@@ -168,13 +247,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with open(args.input,'r') as fp:
-        author_affiliation_list = json.load(fp)
+        paper = json.load(fp)
 
-    authors = author_affiliation_list['authors']
-    affiliations = author_affiliation_list['affiliations']
+    authors = paper['authors']
+    affiliations = paper['affiliations']
 
     render = None
-    if(args.render == 'mnras'):
+    if(args.render == 'sapo'):
+        render = SAPOLatexRenderer(orcid=args.orcid)
+    elif(args.render == 'mnras'):
         render = MNRASLatexRenderer()
     elif(args.render == 'aa'):
         render = AALatexRenderer(orcid=args.orcid)
@@ -195,14 +276,17 @@ if __name__ == "__main__":
             render.affiliation_in_author_block(iaffiliation, affiliation)
         render.end_author_block()
 
-        render.begin_document(args.title)
+        title = args.title
+        if(not title):
+            title = paper['title_latex'] if('title_latex' in paper) else 'Title not set'
+
+        render.begin_document(title, paper['date'] if 'date' in paper else '')
         render.generate_title_pages()
 
         if(not args.suppress_summary):
             print('\n\\section*{Corrections}\n')
-            print('\\flushleft If your details are incorrect on this author list, please let us know using the')
-            print('\\href{https://forms.gle/884xVd46H7XtJbaR6}{\\hypersetup{linkcolor=blue} SAPO change of name and affiliation form}\\footnote{\\url{https://forms.gle/884xVd46H7XtJbaR6}}.')
-            print('\\textbf{Note}, you cannot opt-in to the author list using this form.')
+            print('\\flushleft If your details are incorrect on this author list, please correct them on your')
+            print('\\href{https://cta.cloud.xwiki.com/xwiki/wiki/sapo/view/UserAffiliation/Code/MyAffiliation}{\\hypersetup{linkcolor=blue}SAPO profile page on XWiki}\\footnote{\\url{https://cta.cloud.xwiki.com/xwiki/wiki/sapo/view/UserAffiliation/Code/MyAffiliation}}.')
 
         render.start_affiliations_section(affiliations)
         for iaffiliation,affiliation in enumerate(affiliations):
