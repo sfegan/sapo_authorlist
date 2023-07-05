@@ -89,12 +89,6 @@ class SAPOLatexRenderer(LatexRenderer):
     def generate_title_pages(self):
         pass
 
-    def end_document(self):
-        print('\n\\end{document}')
-
-    def start_author_block(self, authors, affiliations):
-        pass
-
     def author(self, iauthor, author):
         inst = ['\\ref{AFFIL::'+x+'}' for x in author['affil_place_keys']]
         inst = '$^{' + ','.join(inst) + '}$'
@@ -105,15 +99,7 @@ class SAPOLatexRenderer(LatexRenderer):
         self.author_list.append(author['author_latex']+inst)
         pass
 
-    def affiliation_in_author_block(self, iaffiliation, affiliation):
-        pass
-
-    def end_author_block(self):
-        pass
-
     def start_affiliations_section(self, affiliations):
-        print('% Note : in this "astroph" mode we generate the affiliation list ourselves.')
-        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         print('\\section*{Affiliations}')
         print('\\begin{enumerate}[label=$^{\\arabic*}$,ref=\\arabic*,leftmargin=1.5em,labelsep=0.25em,labelwidth=1.25em]')
 
