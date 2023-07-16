@@ -14,6 +14,7 @@ class LatexRenderer:
             print('\\documentclass{',self.document_class,'}',sep='')
         print('\\usepackage{enumitem}')
         print('\\usepackage[T1]{fontenc}')
+        print('\\usepackage{textcomp}')
 
     def begin_document(self, title = "CTA paper author list", date=""):
         print('\\title{',title,'}',sep='')
@@ -50,22 +51,16 @@ class LatexRenderer:
 
 class SAPOLatexRenderer(LatexRenderer):
     def __init__(self, orcid=False, document_class="article", class_options='a4paper,10pt') -> None:
+        super().__init__(document_class, class_options)
         self.orcid = orcid
-        self.document_class = document_class
-        self.class_options = class_options
         self.email_list = []
         self.author_list = []
 
     def setup_class(self):
-        if(self.class_options):
-            print('\\documentclass[',self.class_options,']{',self.document_class,'}',sep='')
-        else:
-            print('\\documentclass{',self.document_class,'}',sep='')
+        super().setup_class()
         print('\\usepackage[margin=2cm, top=2cm, bottom=2cm]{geometry}')
         print('\\usepackage{graphicx}')
         print('\\usepackage{hyperref}')
-        print('\\usepackage{enumitem}')
-        print('\\usepackage[T1]{fontenc}')
         if(self.orcid):
             print('\\newcommand{\\orcid}[1]{\\unskip\\protect\\href{https://orcid.org/#1}{\\protect\\includegraphics[width=8pt,clip]{logo_orcid}}}')
 
