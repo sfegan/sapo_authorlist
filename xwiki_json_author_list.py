@@ -1,4 +1,5 @@
 import json
+import html
 import unicodedata
 import re
 import pylatexenc.latexencode
@@ -8,7 +9,8 @@ def asciify(x):
     return unicodedata.normalize('NFKD', x).encode('ascii', 'ignore').decode('utf-8').strip()
 
 def htmlify(x):
-    return x.encode('ascii', 'xmlcharrefreplace').decode('utf8')
+    return html.escape(x).encode('ascii', 'xmlcharrefreplace').decode()
+#    return x.encode('ascii', 'xmlcharrefreplace').decode('utf8')
 
 def nbspify(x):
     return re.sub('\s+', '&nbsp;', x)
@@ -100,17 +102,19 @@ if __name__ == "__main__":
                 if(place_id not in author_affiliation_key):
                     author_affiliation_key[place_id] = len(affiliations_list)
                     affiliations_list.append(dict(
-                        affil_num          = len(affiliations_list),
-                        affil_num_str      = str(len(affiliations_list)+1),
-                        place_id           = place_id,
-                        place_key          = place_key,
-                        short_name_unicode = place['shortName'],
-                        short_name_latex   = pylatexenc.latexencode.unicode_to_latex(place['shortName']),
-                        country            = place['country'],
-                        address_asciified  = asciify(place['address']),
-                        address_unicode    = place['address'],
-                        address_html       = htmlify(place['address']),
-                        address_latex      = pylatexenc.latexencode.unicode_to_latex(place['address'])
+                        affil_num            = len(affiliations_list),
+                        affil_num_str        = str(len(affiliations_list)+1),
+                        place_id             = place_id,
+                        place_key            = place_key,
+                        short_name_asciified = asciify(place['shortName']),
+                        short_name_unicode   = place['shortName'],
+                        short_name_xml       = htmlify(place['shortName']),
+                        short_name_latex     = pylatexenc.latexencode.unicode_to_latex(place['shortName']),
+                        country              = place['country'],
+                        address_asciified    = asciify(place['address']),
+                        address_unicode      = place['address'],
+                        address_xml          = htmlify(place['address']),
+                        address_latex        = pylatexenc.latexencode.unicode_to_latex(place['address'])
                     ))
                 place_ids.append(place_id)
                 place_keys.append(place_key)
@@ -119,21 +123,28 @@ if __name__ == "__main__":
                 ai += ", %06d"%author_affiliation_key[place_id]
         
         author_list[ai] = dict(
-            author_id        = p['user'],
-            lastname         = p['lastName'],
-            firstname        = p['firstName'],
-            email            = p['email'],
-            corresponding    = False,
-            orcid            = p['orcid'],
-            affil_place_ids  = place_ids,
-            affil_place_keys = place_keys,
-            affil_nums       = affil_nums,
-            affil_num_strs   = affil_num_strs,
-            author_sortorder = p['alphaName'],
-            author_asciified = sig_asciified(sig),
-            author_unicode   = sig,
-            author_html      = sig_html(sig),
-            author_latex     = sig_latex(sig),
+            author_id           = p['user'],
+            lastname_asciified  = asciify(p['lastName']),
+            lastname_unicode    = p['lastName'],
+            lastname_xml        = htmlify(p['lastName']),
+            lastname_latex      = pylatexenc.latexencode.unicode_to_latex(p['lastName']),
+            firstname_asciified = asciify(p['firstName']),
+            firstname_unicode   = p['firstName'],
+            firstname_xml       = htmlify(p['firstName']),
+            firstname_latex     = pylatexenc.latexencode.unicode_to_latex(p['firstName']),
+            email               = p['email'],
+            corresponding       = False,
+            orcid               = p['orcid'],
+            affil_place_ids     = place_ids,
+            affil_place_keys    = place_keys,
+            affil_nums          = affil_nums,
+            affil_num_strs      = affil_num_strs,
+            author_sortorder    = p['alphaName'],
+            author_asciified    = sig_asciified(sig),
+            author_unicode      = sig,
+            author_html         = sig_html(sig),
+            author_xml          = htmlify(sig),
+            author_latex        = sig_latex(sig),
         )
         if p['user'] in paper['corresponding_authors']:
             print("Info corresponding author :", sig)
@@ -192,7 +203,7 @@ if __name__ == "__main__":
     author_affiliation_list = dict(
         _comment        = comment,
         title_unicode   = paper['paper_title'],
-        title_html      = htmlify(paper['paper_title']),
+        title_xml       = htmlify(paper['paper_title']),
         title_latex     = pylatexenc.latexencode.unicode_to_latex(paper['paper_title']),
         title_asciified = asciify(paper['paper_title']),
         date            = paper['date'],
